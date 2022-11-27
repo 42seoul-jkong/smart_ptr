@@ -38,19 +38,19 @@ namespace ft
     };
 
     template <>
-    struct _ptr_dereference<void const>
+    struct _ptr_dereference<const void>
     {
         typedef void type;
     };
 
     template <>
-    struct _ptr_dereference<void volatile>
+    struct _ptr_dereference<volatile void>
     {
         typedef void type;
     };
 
     template <>
-    struct _ptr_dereference<void const volatile>
+    struct _ptr_dereference<const volatile void>
     {
         typedef void type;
     };

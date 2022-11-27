@@ -13,6 +13,9 @@
 namespace ft
 {
     template <typename T>
+    class enable_shared_from_this;
+
+    template <typename T>
     class weak_ptr;
 
     template <typename T>
@@ -22,12 +25,26 @@ namespace ft
         typedef typename _ptr_element_type<T>::type element_type;
 
     private:
-        typedef shared_ptr<T> this_type;
-
-        template <class U>
-        friend class weak_ptr;
-        template <class U>
+        template <typename U>
         friend class shared_ptr;
+        template <typename U>
+        friend class weak_ptr;
+        template <typename U>
+        friend class enable_shared_from_this;
+
+    private:
+        template <typename U, typename V>
+        static inline void _ptr_enable_shared_from_this(const ft::shared_ptr<T>* this_ptr, const ft::enable_shared_from_this<U>* pp, const V* p)
+        {
+            if (pp != NULL)
+            {
+                pp->change_ownership(this_ptr, const_cast<V*>(p));
+            }
+        }
+
+        static inline void _ptr_enable_shared_from_this(...)
+        {
+        }
 
     private:
         element_type* ptr;
@@ -42,7 +59,7 @@ namespace ft
             : ptr(p), ref()
         {
             _shared_count(p).swap(ref);
-            // TODO: enable_shared_from_this
+            _ptr_enable_shared_from_this(this, p, p);
         }
 
         shared_ptr(const shared_ptr& that) throw()
@@ -72,7 +89,7 @@ namespace ft
 
         shared_ptr& operator=(const shared_ptr& that) throw()
         {
-            this_type(that).swap(*this);
+            shared_ptr(that).swap(*this);
             return *this;
         }
 
@@ -81,13 +98,13 @@ namespace ft
         {
             _ptr_assert_convertible<U, T>();
 
-            this_type(that).swap(*this);
+            shared_ptr(that).swap(*this);
             return *this;
         }
 
         void reset() throw()
         {
-            this_type().swap(*this);
+            shared_ptr().swap(*this);
         }
 
         template <typename U>
@@ -95,15 +112,13 @@ namespace ft
         {
             assert(p == NULL || p != this->ptr);
 
-            this_type(p).swap(*this);
-            return *this;
+            shared_ptr(p).swap(*this);
         }
 
         template <typename U>
         void reset(const shared_ptr<U>& that, element_type* p) throw()
         {
-            this_type(that, p).swap(*this);
-            return *this;
+            shared_ptr(that, p).swap(*this);
         }
 
         typename _ptr_dereference<T>::type operator*() const throw()

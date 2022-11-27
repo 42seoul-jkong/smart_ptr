@@ -21,9 +21,9 @@ namespace ft
     private:
         typedef weak_ptr<T> this_type;
 
-        template <class U>
+        template <typename U>
         friend class weak_ptr;
-        template <class U>
+        template <typename U>
         friend class shared_ptr;
 
     private:
@@ -95,7 +95,7 @@ namespace ft
 
         bool expired() const throw()
         {
-            return this->ref.use_count() == 0;
+            return this->use_count() == 0;
         }
 
         shared_ptr<T> lock() const throw()
