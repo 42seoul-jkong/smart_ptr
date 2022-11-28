@@ -12,6 +12,10 @@ namespace ft
     class enable_shared_from_this
     {
     private:
+        template <typename U>
+        friend class shared_ptr;
+
+    private:
         mutable ft::weak_ptr<T> weak_this;
 
     protected:
@@ -27,9 +31,6 @@ namespace ft
         ft::weak_ptr<const T> weak_from_this() const throw() { return this->weak_this; }
 
     private:
-        template <typename U>
-        friend class shared_ptr;
-
         template <typename TAlias, typename U>
         void change_ownership(const ft::shared_ptr<TAlias>* alias, U* p) const throw()
         {

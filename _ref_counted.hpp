@@ -11,9 +11,6 @@ namespace ft
     class _counted_impl : public _counted_base
     {
     private:
-        typedef _counted_impl<T> this_type;
-
-    private:
         T* ptr;
 
         _counted_impl(const _counted_impl&);
@@ -28,6 +25,10 @@ namespace ft
             delete ptr;
         }
     };
+
+    // TODO: Support allocator
+    // template <typename T, typename TAlloc>
+    // class _counted_impl : public _counted_base;
 
     class _weak_count;
 
@@ -45,7 +46,8 @@ namespace ft
             : ptr(ptr) {}
 
         template <typename U>
-        explicit _shared_count(U* p) : ptr(NULL)
+        explicit _shared_count(U* p)
+            : ptr(NULL)
         {
             try
             {
@@ -58,6 +60,10 @@ namespace ft
                 throw;
             }
         }
+
+        // TODO: Support allocator
+        // template <typename UPointer, typename UAlloc>
+        // explicit _shared_count(UPointer p, UAlloc alloc);
 
         _shared_count(const _shared_count& that) throw()
             : ptr(that.ptr)
@@ -234,7 +240,7 @@ namespace ft
     {
         if (this->ptr == NULL || !this->ptr->add_ref_lock())
         {
-            throw;
+            throw std::bad_exception(); // bad_weak_ptr
         }
     }
 

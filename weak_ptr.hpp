@@ -19,8 +19,6 @@ namespace ft
         typedef typename _ptr_element_type<T>::type element_type;
 
     private:
-        typedef weak_ptr<T> this_type;
-
         template <typename U>
         friend class weak_ptr;
         template <typename U>
@@ -105,7 +103,7 @@ namespace ft
 
         void reset() throw()
         {
-            this_type().swap(*this);
+            weak_ptr<T>().swap(*this);
         }
 
         void swap(weak_ptr<T>& that) throw()

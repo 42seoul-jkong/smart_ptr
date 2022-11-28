@@ -58,8 +58,11 @@ namespace ft
         explicit shared_ptr(U* p)
             : ptr(p), ref()
         {
-            _shared_count(p).swap(ref);
-            _ptr_enable_shared_from_this(this, p, p);
+            // TODO: _pointer_construct
+            {
+                _shared_count(p).swap(ref);
+                _ptr_enable_shared_from_this(this, p, p);
+            }
         }
 
         shared_ptr(const shared_ptr& that) throw()
