@@ -227,11 +227,76 @@ namespace ft
     };
 
     template <typename T>
-    struct _ptr_is_not_array
+    struct _ptr_is_array
         : _ptr_integral_constant<
               bool,
-              !_ptr_is_unbounded_array<T>::value &&
-                  !_ptr_is_bounded_array<T>::value>
+              _ptr_is_unbounded_array<T>::value ||
+                  _ptr_is_bounded_array<T>::value>
     {
+    };
+
+    template <typename T>
+    struct _ptr_default_delete
+    {
+        _ptr_default_delete() throw() {}
+        _ptr_default_delete(const _ptr_default_delete&) throw() {}
+
+        void operator()(T* p) const
+        {
+            delete p;
+        }
+    };
+
+    template <typename T>
+    struct _ptr_default_delete<T[]>
+    {
+        _ptr_default_delete() throw() {}
+        _ptr_default_delete(const _ptr_default_delete&) throw() {}
+
+        void operator()(T* p) const
+        {
+            delete[] p;
+        }
+    };
+
+    template <typename T, std::size_t N>
+    struct _ptr_default_delete<T[N]> : _ptr_default_delete<T[]>
+    {
+    };
+
+    template <typename T, typename TAlloc>
+    struct _ptr_allocator_delete
+    {
+        typedef typename TAlloc::template rebind<T>::other alloc_type;
+
+        _ptr_allocator_delete(const TAlloc alloc) throw() : alloc(alloc) {}
+        _ptr_allocator_delete(const _ptr_allocator_delete& that) throw() : alloc(that.alloc) {}
+
+        void operator()(typename alloc_type::pointer p) const
+        {
+            alloc.deallocate(p, 1);
+        }
+
+    private:
+        alloc_type alloc;
+    };
+
+    // TODO: T[]?
+
+    template <typename T, std::size_t N, typename TAlloc>
+    struct _ptr_allocator_delete<T[N], TAlloc>
+    {
+        typedef typename TAlloc::template rebind<T>::other alloc_type;
+
+        _ptr_allocator_delete(const TAlloc alloc) throw() : alloc(alloc) {}
+        _ptr_allocator_delete(const _ptr_allocator_delete& that) throw() : alloc(that.alloc) {}
+
+        void operator()(typename alloc_type::pointer p) const
+        {
+            alloc.deallocate(p, N);
+        }
+
+    private:
+        alloc_type alloc;
     };
 }

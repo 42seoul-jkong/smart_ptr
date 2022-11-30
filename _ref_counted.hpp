@@ -45,25 +45,41 @@ namespace ft
         explicit _shared_count(_counted_base* ptr) throw()
             : ptr(ptr) {}
 
-        template <typename U>
-        explicit _shared_count(U* p)
+        template <typename T>
+        explicit _shared_count(T* p)
             : ptr(NULL)
         {
             try
             {
-                this->ptr = new _counted_impl<U>(p);
+                this->ptr = new _counted_impl<T>(p);
             }
             catch (...)
             {
-                // TODO: ...
                 delete p;
                 throw;
             }
         }
 
-        // TODO: Support allocator
-        // template <typename UPointer, typename UAlloc>
-        // explicit _shared_count(UPointer p, UAlloc alloc);
+        template <typename TPointer, typename TDelete>
+        _shared_count(TPointer p, TDelete del)
+        {
+            // TODO: ...
+        }
+
+        template <typename TPointer, typename TDelete, typename TAlloc>
+        _shared_count(TPointer p, TDelete del, TAlloc alloc)
+        {
+            // TODO: ...
+        }
+
+        // Internal BEGIN
+        template <typename T, typename TAlloc>
+        _shared_count(T** pp, const TAlloc& alloc, const T& value)
+        {
+            // TODO: ...
+            *pp = NULL;
+        }
+        // Internal END
 
         _shared_count(const _shared_count& that) throw()
             : ptr(that.ptr)
