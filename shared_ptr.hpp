@@ -33,8 +33,8 @@ namespace ft
         friend class enable_shared_from_this;
 
     private:
-        template <typename U, typename V>
-        static inline typename _ptr_enable_if<!_ptr_is_array<T>::value, void>::type _ptr_enable_shared_from_this(const ft::shared_ptr<T>* this_ptr, const U* p, const ft::enable_shared_from_this<V>* from)
+        template <typename TType, typename U, typename V>
+        static inline typename _ptr_enable_if<!_ptr_is_array<TType>::value, void>::type _ptr_enable_shared_from_this(const ft::shared_ptr<T>* this_ptr, const U* p, const ft::enable_shared_from_this<V>* from)
         {
             if (from != NULL)
             {
@@ -42,6 +42,7 @@ namespace ft
             }
         }
 
+        template <typename TType>
         static inline void _ptr_enable_shared_from_this(...)
         {
         }
@@ -60,7 +61,7 @@ namespace ft
         {
             _ptr_assert_convertible<U, element_type>();
             _shared_count(p).swap(this->ref);
-            _ptr_enable_shared_from_this(this, p, p);
+            _ptr_enable_shared_from_this<T>(this, p, p);
         }
 
         template <typename U, typename TDelete>
@@ -68,7 +69,7 @@ namespace ft
             : ptr(p), ref(p, del)
         {
             _ptr_assert_convertible<U, element_type>();
-            _ptr_enable_shared_from_this(this, p, p);
+            _ptr_enable_shared_from_this<T>(this, p, p);
         }
 
         template <typename U, typename TDelete, typename TAlloc>
@@ -76,7 +77,7 @@ namespace ft
             : ptr(p), ref(p, del, alloc)
         {
             _ptr_assert_convertible<U, element_type>();
-            _ptr_enable_shared_from_this(this, p, p);
+            _ptr_enable_shared_from_this<T>(this, p, p);
         }
 
         shared_ptr(const shared_ptr& that) throw()
@@ -108,7 +109,7 @@ namespace ft
         shared_ptr(const TAlloc& alloc, const T& value)
             : ptr(), ref(&this->ptr, alloc, value)
         {
-            _ptr_enable_shared_from_this(this, this->ptr, this->ptr);
+            _ptr_enable_shared_from_this<T>(this, this->ptr, this->ptr);
         }
         // Internal END
 

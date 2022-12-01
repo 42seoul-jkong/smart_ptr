@@ -34,11 +34,7 @@ namespace ft
         }
 
         virtual void dispose() = 0; // throw()
-
-        virtual void destroy() // throw()
-        {
-            delete this;
-        }
+        virtual void destroy() = 0; // throw()
 
         void add_ref_copy()
         {

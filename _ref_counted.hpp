@@ -5,6 +5,8 @@
 
 #include "__ref_counted_base_posix.hpp"
 
+#include <exception>
+
 namespace ft
 {
     template <typename T>
@@ -17,26 +19,85 @@ namespace ft
         _counted_impl& operator=(const _counted_impl&);
 
     public:
-        explicit _counted_impl(T* ptr) : ptr(ptr) {}
+        explicit _counted_impl(T* ptr)
+            : ptr(ptr) {}
 
         void dispose() throw()
         {
-            // TODO: delete[]?
             delete ptr;
+        }
+
+        void destroy() throw()
+        {
+            delete this;
         }
     };
 
-    // TODO: Support allocator
-    // template <typename T, typename TAlloc>
-    // class _counted_impl : public _counted_base;
+    template <typename TPointer, typename TDelete>
+    class _counted_impl_del : public _counted_base
+    {
+    private:
+        TPointer ptr;
+        TDelete del;
+
+        _counted_impl_del(const _counted_impl_del&);
+        _counted_impl_del& operator=(const _counted_impl_del&);
+
+    public:
+        explicit _counted_impl_del(TPointer ptr, const TDelete& del)
+            : ptr(ptr), del(del) {}
+
+        void dispose() throw()
+        {
+            this->del(ptr);
+        }
+
+        void destroy() throw()
+        {
+            delete this;
+        }
+    };
+
+    template <typename TPointer, typename TDelete, typename TAlloc>
+    class _counted_impl_del_alloc : public _counted_base
+    {
+    private:
+        TPointer ptr;
+        TDelete del;
+        TAlloc alloc;
+
+        _counted_impl_del_alloc(const _counted_impl_del_alloc&);
+        _counted_impl_del_alloc& operator=(const _counted_impl_del_alloc&);
+
+    public:
+        explicit _counted_impl_del_alloc(TPointer ptr, const TDelete& del, const TAlloc& alloc)
+            : ptr(ptr), del(del), alloc(alloc) {}
+
+        void dispose() throw()
+        {
+            this->del(ptr);
+        }
+
+        void destroy() throw()
+        {
+            typedef _counted_impl_del_alloc TCounted;
+            typedef typename TAlloc::template rebind<TCounted>::other TAllocCounted;
+
+            TAllocCounted alloc_counted(this->alloc);
+            static_cast<TCounted*>(this)->~TCounted();
+            alloc_counted.deallocate(this, 1);
+        }
+    };
 
     class _weak_count;
 
     class _shared_count
     {
     private:
-        _counted_base* ptr;
         friend class _weak_count;
+
+    private:
+        _counted_base* ptr;
 
     public:
         _shared_count() throw()
@@ -63,13 +124,39 @@ namespace ft
         template <typename TPointer, typename TDelete>
         _shared_count(TPointer p, TDelete del)
         {
-            // TODO: ...
+            try
+            {
+                this->ptr = new _counted_impl_del<TPointer, TDelete>(p, del);
+            }
+            catch (...)
+            {
+                del(p);
+                throw;
+            }
         }
 
         template <typename TPointer, typename TDelete, typename TAlloc>
         _shared_count(TPointer p, TDelete del, TAlloc alloc)
         {
-            // TODO: ...
+            typedef _counted_impl_del_alloc<TPointer, TDelete, TAlloc> TCounted;
+            typedef typename TAlloc::template rebind<TCounted>::other TAllocCounted;
+
+            TAllocCounted alloc_counted(alloc);
+            this->ptr = NULL;
+            try
+            {
+                this->ptr = alloc_counted.allocate(1);
+                ::new (this->ptr) TCounted(p, del, alloc);
+            }
+            catch (...)
+            {
+                if (this->ptr != NULL)
+                {
+                    alloc_counted.deallocate(static_cast<TCounted*>(this->ptr), 1);
+                }
+                del(p);
+                throw;
+            }
         }
 
         // Internal BEGIN
@@ -155,8 +242,10 @@ namespace ft
     class _weak_count
     {
     private:
-        _counted_base* ptr;
         friend class _shared_count;
+
+    private:
+        _counted_base* ptr;
 
     public:
         _weak_count() throw()
