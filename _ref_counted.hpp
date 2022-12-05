@@ -80,11 +80,11 @@ namespace ft
 
         void destroy() throw()
         {
-            typedef _counted_impl_del_alloc TCounted;
-            typedef typename TAlloc::template rebind<TCounted>::other TAllocCounted;
+            typedef _counted_impl_del_alloc counted_type;
+            typedef typename TAlloc::template rebind<counted_type>::other alloc_type;
 
-            TAllocCounted alloc_counted(this->alloc);
-            static_cast<TCounted*>(this)->~TCounted();
+            alloc_type alloc_counted(this->alloc);
+            static_cast<counted_type*>(this)->~counted_type();
             alloc_counted.deallocate(this, 1);
         }
     };
@@ -138,21 +138,21 @@ namespace ft
         template <typename TPointer, typename TDelete, typename TAlloc>
         _shared_count(TPointer p, TDelete del, TAlloc alloc)
         {
-            typedef _counted_impl_del_alloc<TPointer, TDelete, TAlloc> TCounted;
-            typedef typename TAlloc::template rebind<TCounted>::other TAllocCounted;
+            typedef _counted_impl_del_alloc<TPointer, TDelete, TAlloc> counted_type;
+            typedef typename TAlloc::template rebind<counted_type>::other alloc_type;
 
-            TAllocCounted alloc_counted(alloc);
+            alloc_type alloc_counted(alloc);
             this->ptr = NULL;
             try
             {
                 this->ptr = alloc_counted.allocate(1);
-                ::new (this->ptr) TCounted(p, del, alloc);
+                ::new (this->ptr) counted_type(p, del, alloc);
             }
             catch (...)
             {
                 if (this->ptr != NULL)
                 {
-                    alloc_counted.deallocate(static_cast<TCounted*>(this->ptr), 1);
+                    alloc_counted.deallocate(static_cast<counted_type*>(this->ptr), 1);
                 }
                 del(p);
                 throw;
@@ -160,10 +160,10 @@ namespace ft
         }
 
         // Internal BEGIN
-        template <typename T, typename TAlloc>
-        _shared_count(T** pp, const TAlloc& alloc, const T& value)
+        template <typename T, typename TAlloc, typename TInitializer>
+        _shared_count(_ptr_internal_tag, T** pp, const TAlloc& alloc, TInitializer init)
         {
-            // TODO: ...
+            // TODO: Implement internal constructor
             *pp = NULL;
         }
         // Internal END

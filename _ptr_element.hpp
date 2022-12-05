@@ -7,6 +7,10 @@
 
 namespace ft
 {
+    struct _ptr_internal_tag
+    {
+    };
+
     template <typename T, T Value>
     struct _ptr_integral_constant
     {
@@ -267,36 +271,40 @@ namespace ft
     template <typename T, typename TAlloc>
     struct _ptr_allocator_delete
     {
-        typedef typename TAlloc::template rebind<T>::other alloc_type;
-
-        _ptr_allocator_delete(const TAlloc alloc) throw() : alloc(alloc) {}
+        _ptr_allocator_delete(const TAlloc& alloc) throw() : alloc(alloc) {}
         _ptr_allocator_delete(const _ptr_allocator_delete& that) throw() : alloc(that.alloc) {}
 
-        void operator()(typename alloc_type::pointer p) const
+        template <typename U>
+        void operator()(U* p) const
         {
+            typedef typename TAlloc::template rebind<U>::other alloc_type;
+
+            alloc_type alloc(this->alloc);
+
             alloc.deallocate(p, 1);
         }
 
     private:
-        alloc_type alloc;
+        TAlloc alloc;
     };
-
-    // TODO: T[]?
 
     template <typename T, std::size_t N, typename TAlloc>
     struct _ptr_allocator_delete<T[N], TAlloc>
     {
-        typedef typename TAlloc::template rebind<T>::other alloc_type;
-
-        _ptr_allocator_delete(const TAlloc alloc) throw() : alloc(alloc) {}
+        _ptr_allocator_delete(const TAlloc& alloc) throw() : alloc(alloc) {}
         _ptr_allocator_delete(const _ptr_allocator_delete& that) throw() : alloc(that.alloc) {}
 
-        void operator()(typename alloc_type::pointer p) const
+        template <typename U>
+        void operator()(U* p) const
         {
+            typedef typename TAlloc::template rebind<U>::other alloc_type;
+
+            alloc_type alloc(this->alloc);
+
             alloc.deallocate(p, N);
         }
 
     private:
-        alloc_type alloc;
+        TAlloc alloc;
     };
 }

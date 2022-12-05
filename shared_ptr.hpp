@@ -42,7 +42,7 @@ namespace ft
             }
         }
 
-        template <typename TType>
+        template <typename>
         static inline void _ptr_enable_shared_from_this(...)
         {
         }
@@ -104,10 +104,9 @@ namespace ft
         }
 
         // Internal BEGIN
-        // TODO: implement
-        template <typename TAlloc>
-        shared_ptr(const TAlloc& alloc, const T& value)
-            : ptr(), ref(&this->ptr, alloc, value)
+        template <typename TAlloc, typename TInitializer>
+        shared_ptr(_ptr_internal_tag, const TAlloc& alloc, TInitializer init)
+            : ptr(), ref(_ptr_internal_tag(), &this->ptr, alloc, init)
         {
             _ptr_enable_shared_from_this<T>(this, this->ptr, this->ptr);
         }
