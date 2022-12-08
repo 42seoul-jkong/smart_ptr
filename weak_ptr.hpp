@@ -16,7 +16,7 @@ namespace ft
     class weak_ptr
     {
     public:
-        typedef typename _ptr_element_type<T>::type element_type;
+        typedef typename _internal::element_type<T>::type element_type;
 
     private:
         template <typename U>
@@ -36,7 +36,7 @@ namespace ft
         weak_ptr(const shared_ptr<U>& that) throw()
             : ptr(that.ptr), ref(that.ref)
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
         }
 
         weak_ptr(const weak_ptr& that) throw()
@@ -46,7 +46,7 @@ namespace ft
         weak_ptr(const weak_ptr<U>& that) throw()
             : ptr(that.ptr), ref(that.ref)
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
         }
 
         template <typename U>
@@ -69,7 +69,7 @@ namespace ft
         template <typename U>
         weak_ptr& operator=(const weak_ptr<U>& that) throw()
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
 
             this->ptr = that.lock().get();
             this->ref = that.ref;
@@ -79,7 +79,7 @@ namespace ft
         template <typename U>
         weak_ptr& operator=(const shared_ptr<U>& that) throw()
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
 
             this->ptr = that.ptr;
             this->ref = that.ref;

@@ -22,7 +22,7 @@ namespace ft
     class shared_ptr
     {
     public:
-        typedef typename _ptr_element_type<T>::type element_type;
+        typedef typename _internal::element_type<T>::type element_type;
 
     private:
         template <typename U>
@@ -34,7 +34,7 @@ namespace ft
 
     private:
         template <typename TType, typename U, typename V>
-        static inline typename _ptr_enable_if<!_ptr_is_array<TType>::value, void>::type _ptr_enable_shared_from_this(const ft::shared_ptr<T>* this_ptr, const U* p, const ft::enable_shared_from_this<V>* from)
+        static inline typename _internal::enable_if<!_internal::is_array<TType>::value, void>::type _ptr_enable_shared_from_this(const ft::shared_ptr<T>* this_ptr, const U* p, const ft::enable_shared_from_this<V>* from)
         {
             if (from != NULL)
             {
@@ -59,7 +59,7 @@ namespace ft
         explicit shared_ptr(U* p)
             : ptr(p), ref()
         {
-            _ptr_assert_convertible<U, element_type>();
+            _internal::assert_convertible<U, element_type>();
             _shared_count(p).swap(this->ref);
             _ptr_enable_shared_from_this<T>(this, p, p);
         }
@@ -68,7 +68,7 @@ namespace ft
         shared_ptr(U* p, TDelete del)
             : ptr(p), ref(p, del)
         {
-            _ptr_assert_convertible<U, element_type>();
+            _internal::assert_convertible<U, element_type>();
             _ptr_enable_shared_from_this<T>(this, p, p);
         }
 
@@ -76,7 +76,7 @@ namespace ft
         shared_ptr(U* p, TDelete del, TAlloc alloc)
             : ptr(p), ref(p, del, alloc)
         {
-            _ptr_assert_convertible<U, element_type>();
+            _internal::assert_convertible<U, element_type>();
             _ptr_enable_shared_from_this<T>(this, p, p);
         }
 
@@ -87,7 +87,7 @@ namespace ft
         shared_ptr(const shared_ptr<U>& that) throw()
             : ptr(that.ptr), ref(that.ref)
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
         }
 
         template <typename U>
@@ -98,15 +98,15 @@ namespace ft
         explicit shared_ptr(const weak_ptr<U>& that)
             : ref(that.ref)
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
 
             this->ptr = that.ptr;
         }
 
         // Internal BEGIN
         template <typename TAlloc, typename TInitializer>
-        shared_ptr(_ptr_internal_tag, const TAlloc& alloc, TInitializer init)
-            : ptr(), ref(_ptr_internal_tag(), &this->ptr, alloc, init)
+        shared_ptr(_internal::internal_tag, const TAlloc& alloc, TInitializer init)
+            : ptr(), ref(_internal::internal_tag(), &this->ptr, alloc, init)
         {
             _ptr_enable_shared_from_this<T>(this, this->ptr, this->ptr);
         }
@@ -123,7 +123,7 @@ namespace ft
         template <typename U>
         shared_ptr& operator=(const shared_ptr<U>& that) throw()
         {
-            _ptr_assert_convertible<U, T>();
+            _internal::assert_convertible<U, T>();
 
             shared_ptr(that).swap(*this);
             return *this;
@@ -148,24 +148,24 @@ namespace ft
             shared_ptr(that, p).swap(*this);
         }
 
-        typename _ptr_dereference<T>::type operator*() const throw()
+        typename _internal::dereference<T>::type operator*() const throw()
         {
             assert(this->ptr != NULL);
 
             return *this->ptr;
         }
 
-        typename _ptr_member_access<T>::type operator->() const throw()
+        typename _internal::member_access<T>::type operator->() const throw()
         {
             assert(this->ptr != NULL);
 
             return this->ptr;
         }
 
-        typename _ptr_array_access<T>::type operator[](std::ptrdiff_t i) const throw()
+        typename _internal::array_access<T>::type operator[](std::ptrdiff_t i) const throw()
         {
             assert(this->ptr != NULL);
-            assert(i >= 0 && (i < _ptr_array_extent<T>::value || _ptr_array_extent<T>::value == 0));
+            assert(i >= 0 && (i < _internal::array_extent<T>::value || _internal::array_extent<T>::value == 0));
 
             return this->ptr[i];
         }

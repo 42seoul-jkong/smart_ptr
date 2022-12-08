@@ -161,7 +161,7 @@ namespace ft
 
         // Internal BEGIN
         template <typename T, typename TAlloc, typename TInitializer>
-        _shared_count(_ptr_internal_tag, T** pp, const TAlloc& alloc, TInitializer init)
+        _shared_count(_internal::internal_tag, T** pp, const TAlloc& alloc, TInitializer init)
         {
             // TODO: Implement internal constructor
             *pp = NULL;

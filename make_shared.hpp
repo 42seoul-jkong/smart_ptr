@@ -23,7 +23,7 @@ namespace ft
 
         T* p = alloc.allocate(1);
         new (p) T;
-        return ft::shared_ptr<T>(p, _ptr_allocator_delete<T, alloc_type>(alloc), alloc);
+        return ft::shared_ptr<T>(p, _internal::allocator_delete<T, alloc_type>(alloc), alloc);
     }
 
     // TODO: Forward arguments and use internal constructor
