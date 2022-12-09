@@ -104,9 +104,9 @@ namespace ft
         }
 
         // Internal BEGIN
-        template <typename TAlloc, typename TInitializer>
-        shared_ptr(_internal::internal_tag, const TAlloc& alloc, TInitializer init)
-            : ptr(), ref(_internal::internal_tag(), &this->ptr, alloc, init)
+        template <typename TStorage>
+        shared_ptr(_internal::internal_tag, const TStorage& storage)
+            : ptr(), ref(_internal::internal_tag(), &this->ptr, storage)
         {
             _ptr_enable_shared_from_this<T>(this, this->ptr, this->ptr);
         }

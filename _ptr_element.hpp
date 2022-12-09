@@ -242,71 +242,42 @@ namespace ft
         };
 
         template <typename T>
-        struct default_delete
+        inline T* addressof(T& arg) throw()
         {
-            default_delete() throw() {}
-            default_delete(const default_delete&) throw() {}
+            return reinterpret_cast<T*>(
+                &const_cast<char&>(
+                    reinterpret_cast<const volatile char&>(arg)));
+        }
 
-            void operator()(T* p) const
+        template <typename TAlloc>
+        struct allocate_guard
+        {
+            typedef typename TAlloc::value_type value_type;
+            typedef value_type* pointer;
+
+            allocate_guard(const TAlloc& alloc)
+                : alloc(alloc)
             {
-                delete p;
+                this->ptr = this->alloc.allocate(1);
             }
-        };
 
-        template <typename T>
-        struct default_delete<T[]>
-        {
-            default_delete() throw() {}
-            default_delete(const default_delete&) throw() {}
-
-            void operator()(T* p) const
+            ~allocate_guard()
             {
-                delete[] p;
+                if (this->ptr != NULL)
+                {
+                    this->alloc.deallocate(this->ptr, 1);
+                }
             }
-        };
 
-        template <typename T, std::size_t N>
-        struct default_delete<T[N]> : default_delete<T[]>
-        {
-        };
+            pointer get() const { return this->ptr; }
+            void reset() { this->ptr = NULL; }
 
-        template <typename T, typename TAlloc>
-        struct allocator_delete
-        {
-            allocator_delete(const TAlloc& alloc) throw() : alloc(alloc) {}
-            allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc) {}
-
-            template <typename U>
-            void operator()(U* p) const
-            {
-                typedef typename TAlloc::template rebind<U>::other alloc_type;
-
-                alloc_type alloc(this->alloc);
-
-                alloc.deallocate(p, 1);
-            }
+        private:
+            allocate_guard& operator=(const allocate_guard&);
 
         private:
             TAlloc alloc;
+            pointer ptr;
         };
-
-        template <typename T, std::size_t N, typename TAlloc>
-        struct allocator_delete<T[N], TAlloc>
-        {
-            allocator_delete(const TAlloc& alloc) throw() : alloc(alloc) {}
-            allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc) {}
-
-            template <typename U>
-            void operator()(U* p) const
-            {
-                typedef typename TAlloc::template rebind<U>::other alloc_type;
-
-                alloc_type alloc(this->alloc);
-
-                alloc.deallocate(p, N);
-            }
-
-        private:
-            TAlloc alloc;
-        };
+    }
 }

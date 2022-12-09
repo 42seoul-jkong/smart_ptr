@@ -24,13 +24,16 @@ namespace ft
 
         void dispose() throw()
         {
-            delete ptr;
+            ::delete ptr;
         }
 
         void destroy() throw()
         {
-            delete this;
+            ::delete this;
         }
+
+    public:
+        T* get_pointer() { return this->ptr; }
     };
 
     template <typename TPointer, typename TDelete>
@@ -56,6 +59,12 @@ namespace ft
         {
             delete this;
         }
+
+    public:
+        TPointer get_pointer() { return this->ptr; }
+
+        TDelete& get_deleter() { return this->del; }
+        const TDelete& get_deleter() const { return this->del; }
     };
 
     template <typename TPointer, typename TDelete, typename TAlloc>
@@ -87,6 +96,15 @@ namespace ft
             static_cast<counted_type*>(this)->~counted_type();
             alloc_counted.deallocate(this, 1);
         }
+
+    public:
+        TPointer get_pointer() { return this->ptr; }
+
+        TDelete& get_deleter() { return this->del; }
+        const TDelete& get_deleter() const { return this->del; }
+
+        TAlloc& get_allocator() { return this->alloc; }
+        const TAlloc& get_allocator() const { return this->alloc; }
     };
 
     class _weak_count;
@@ -112,11 +130,11 @@ namespace ft
         {
             try
             {
-                this->ptr = new _counted_impl<T>(p);
+                this->ptr = ::new _counted_impl<T>(p);
             }
             catch (...)
             {
-                delete p;
+                ::delete p;
                 throw;
             }
         }
@@ -126,7 +144,7 @@ namespace ft
         {
             try
             {
-                this->ptr = new _counted_impl_del<TPointer, TDelete>(p, del);
+                this->ptr = ::new _counted_impl_del<TPointer, TDelete>(p, del);
             }
             catch (...)
             {
@@ -142,29 +160,47 @@ namespace ft
             typedef typename TAlloc::template rebind<counted_type>::other alloc_type;
 
             alloc_type alloc_counted(alloc);
-            this->ptr = NULL;
+            _internal::allocate_guard<alloc_type> guard(alloc_counted);
+            counted_type* ptr = guard.get();
             try
             {
-                this->ptr = alloc_counted.allocate(1);
-                ::new (this->ptr) counted_type(p, del, alloc);
+                ::new (ptr) counted_type(p, del, alloc);
             }
             catch (...)
             {
-                if (this->ptr != NULL)
-                {
-                    alloc_counted.deallocate(static_cast<counted_type*>(this->ptr), 1);
-                }
+                static_cast<counted_type*>(ptr)->~counted_type();
+
                 del(p);
                 throw;
             }
+
+            this->ptr = ptr;
+            guard.reset();
         }
 
         // Internal BEGIN
-        template <typename T, typename TAlloc, typename TInitializer>
-        _shared_count(_internal::internal_tag, T** pp, const TAlloc& alloc, TInitializer init)
+        template <typename T, typename TStorage>
+        _shared_count(_internal::internal_tag, T** pp, const TStorage& storage)
         {
-            // TODO: Implement internal constructor
-            *pp = NULL;
+            typedef _counted_impl_del_alloc<typename TStorage::pointer_type, TStorage, typename TStorage::allocate_type> counted_type;
+            typedef typename TStorage::allocate_type::template rebind<counted_type>::other alloc_type;
+
+            alloc_type alloc_counted(storage.alloc);
+            _internal::allocate_guard<alloc_type> guard(alloc_counted);
+            counted_type* ptr = guard.get();
+            try
+            {
+                TStorage& new_storage = ptr->get_deleter();
+                ::new (ptr) counted_type(_internal::addressof(new_storage.data), storage, storage.alloc);
+            }
+            catch (...)
+            {
+                static_cast<counted_type*>(ptr)->~counted_type();
+                throw;
+            }
+
+            this->ptr = ptr;
+            guard.reset();
         }
         // Internal END
 
