@@ -5,6 +5,8 @@
 
 #include "shared_ptr.hpp"
 
+#include <cstddef>
+
 namespace ft
 {
     namespace _internal
@@ -13,12 +15,11 @@ namespace ft
         template <typename T, typename TAlloc>
         struct deleter_storage
         {
-            T data;
-            TAlloc alloc;
-
-        public:
             typedef T* pointer_type;
             typedef TAlloc allocate_type;
+
+            T data;
+            TAlloc alloc;
 
         public:
             deleter_storage(const T& data, const TAlloc& alloc) throw() : data(data), alloc(alloc) {}
@@ -40,12 +41,11 @@ namespace ft
         template <typename T, std::size_t N, typename TAlloc>
         struct deleter_storage<T[N], TAlloc>
         {
-            T data[N];
-            TAlloc alloc;
-
-        public:
             typedef T* pointer_type;
             typedef TAlloc allocate_type;
+
+            T data[N];
+            TAlloc alloc;
 
         public:
             deleter_storage(const TAlloc& alloc) throw() : alloc(alloc) {}
@@ -59,13 +59,103 @@ namespace ft
         private:
             deleter_storage& operator=(const deleter_storage&);
         };
+
+        template <typename T, typename TAlloc>
+        struct allocator_delete
+        {
+            TAlloc alloc;
+
+        public:
+            allocator_delete(const TAlloc& alloc) throw() : alloc(alloc) {}
+            allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc) {}
+            ~allocator_delete() {}
+
+            template <typename U>
+            void operator()(U* p) const
+            {
+                typedef typename TAlloc::template rebind<U>::other alloc_type;
+
+                alloc_type alloc(this->alloc);
+
+                alloc.deallocate(p, 1);
+            }
+
+        private:
+            allocator_delete& operator=(const allocator_delete&);
+        };
+
+        template <typename T, typename TAlloc>
+        struct allocator_delete<T[], TAlloc>
+        {
+            TAlloc alloc;
+            std::size_t n;
+
+        public:
+            allocator_delete(const TAlloc& alloc, std::size_t n) throw() : alloc(alloc), n(n) {}
+            allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc), n(that.n) {}
+
+            template <typename U>
+            void operator()(U* p) const
+            {
+                typedef typename TAlloc::template rebind<U>::other alloc_type;
+
+                alloc_type alloc(this->alloc);
+
+                alloc.deallocate(p, this->n);
+            }
+
+        private:
+            allocator_delete& operator=(const allocator_delete&);
+        };
+
+        template <typename T, std::size_t N, typename TAlloc>
+        struct allocator_delete<T[N], TAlloc>
+        {
+            TAlloc alloc;
+
+        public:
+            allocator_delete(const TAlloc& alloc) throw() : alloc(alloc) {}
+            allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc) {}
+
+            template <typename U>
+            void operator()(U* p) const
+            {
+                typedef typename TAlloc::template rebind<U>::other alloc_type;
+
+                alloc_type alloc(this->alloc);
+
+                alloc.deallocate(p, N);
+            }
+
+        private:
+            allocator_delete& operator=(const allocator_delete&);
+        };
     }
 
     template <typename T, typename TAlloc>
-    ft::shared_ptr<T> allocate_shared(const TAlloc& a)
+    typename _internal::enable_if<!_internal::is_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a)
     {
         return ft::shared_ptr<T>(_internal::internal_tag(), _internal::deleter_storage<T, TAlloc>(T(), a));
     }
+
+    template <typename T, typename TAlloc>
+    typename _internal::enable_if<_internal::is_bounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a)
+    {
+        // TODO:
+        return ft::shared_ptr<T>(_internal::internal_tag(), _internal::deleter_storage<T, TAlloc>(a));
+    }
+
+    template <typename T, typename TAlloc>
+    typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n)
+    {
+        // TODO:
+        _internal::allocate_guard<TAlloc> alloc(a, n);
+        ft::shared_ptr<T> result = ft::shared_ptr<T>(alloc.get(), _internal::allocator_delete<T, TAlloc>(a, n), a);
+        alloc.reset();
+        return result;
+    }
+
+    // TODO: array element, but the elements of the array are initialized from the default value.
 
     template <typename T>
     ft::shared_ptr<T> make_shared()

@@ -255,17 +255,22 @@ namespace ft
             typedef typename TAlloc::value_type value_type;
             typedef value_type* pointer;
 
-            allocate_guard(const TAlloc& alloc)
-                : alloc(alloc)
+            TAlloc alloc;
+            std::size_t n;
+            pointer ptr;
+
+        public:
+            allocate_guard(const TAlloc& alloc, std::size_t n = 1)
+                : alloc(alloc), n(n)
             {
-                this->ptr = this->alloc.allocate(1);
+                this->ptr = this->alloc.allocate(this->n);
             }
 
             ~allocate_guard()
             {
                 if (this->ptr != NULL)
                 {
-                    this->alloc.deallocate(this->ptr, 1);
+                    this->alloc.deallocate(this->ptr, this->n);
                 }
             }
 
@@ -274,10 +279,6 @@ namespace ft
 
         private:
             allocate_guard& operator=(const allocate_guard&);
-
-        private:
-            TAlloc alloc;
-            pointer ptr;
         };
     }
 }
