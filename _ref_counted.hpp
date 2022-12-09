@@ -161,20 +161,20 @@ namespace ft
 
             alloc_type alloc_counted(alloc);
             _internal::allocate_guard<alloc_type> guard(alloc_counted);
-            counted_type* ptr = guard.get();
+
+            counted_type* this_ptr = guard.get();
+
             try
             {
-                ::new (ptr) counted_type(p, del, alloc);
+                ::new (this_ptr) counted_type(p, del, alloc);
             }
             catch (...)
             {
-                static_cast<counted_type*>(ptr)->~counted_type();
-
                 del(p);
                 throw;
             }
 
-            this->ptr = ptr;
+            this->ptr = this_ptr;
             guard.reset();
         }
 
@@ -187,19 +187,15 @@ namespace ft
 
             alloc_type alloc_counted(storage.alloc);
             _internal::allocate_guard<alloc_type> guard(alloc_counted);
-            counted_type* ptr = guard.get();
-            try
-            {
-                TStorage& new_storage = ptr->get_deleter();
-                ::new (ptr) counted_type(_internal::addressof(new_storage.data), storage, storage.alloc);
-            }
-            catch (...)
-            {
-                static_cast<counted_type*>(ptr)->~counted_type();
-                throw;
-            }
 
-            this->ptr = ptr;
+            counted_type* this_ptr = guard.get();
+            TStorage& this_storage = this_ptr->get_deleter();
+            T* this_p = _internal::addressof(this_storage.data);
+
+            ::new (this_ptr) counted_type(this_p, storage, storage.alloc);
+
+            this->ptr = this_ptr;
+            *pp = this_p;
             guard.reset();
         }
         // Internal END
