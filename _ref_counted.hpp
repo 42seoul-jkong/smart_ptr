@@ -57,7 +57,7 @@ namespace ft
 
         void destroy() throw()
         {
-            delete this;
+            ::delete this;
         }
 
     public:
@@ -185,14 +185,14 @@ namespace ft
             typedef _counted_impl_del_alloc<typename TStorage::pointer_type, TStorage, typename TStorage::allocate_type> counted_type;
             typedef typename TStorage::allocate_type::template rebind<counted_type>::other alloc_type;
 
-            alloc_type alloc_counted(storage.alloc);
+            alloc_type alloc_counted(storage.get_allocator());
             _internal::allocate_guard<alloc_type> guard(alloc_counted);
 
             counted_type* this_ptr = guard.get();
             TStorage& this_storage = this_ptr->get_deleter();
-            T* this_p = _internal::addressof(this_storage.data);
+            T* this_p = this_storage.get_data();
 
-            ::new (this_ptr) counted_type(this_p, storage, storage.alloc);
+            ::new (this_ptr) counted_type(this_p, storage, alloc_counted);
 
             this->ptr = this_ptr;
             *pp = this_p;

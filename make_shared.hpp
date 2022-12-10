@@ -33,6 +33,10 @@ namespace ft
                 static_cast<T*>(p)->~T();
             }
 
+        public:
+            pointer_type get_data() { return _internal::addressof(this->data); }
+            const allocate_type& get_allocator() const { return this->alloc; }
+
         private:
             deleter_storage& operator=(const deleter_storage&);
         };
@@ -55,6 +59,10 @@ namespace ft
         public:
             template <typename U>
             void operator()(U* p) const {}
+
+        public:
+            pointer_type get_data() { return this->data; }
+            const allocate_type& get_allocator() const { return this->alloc; }
 
         private:
             deleter_storage& operator=(const deleter_storage&);
@@ -141,7 +149,6 @@ namespace ft
     template <typename T, typename TAlloc>
     typename _internal::enable_if<_internal::is_bounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a)
     {
-        // TODO:
         return ft::shared_ptr<T>(_internal::internal_tag(), _internal::deleter_storage<T, TAlloc>(a));
     }
 
