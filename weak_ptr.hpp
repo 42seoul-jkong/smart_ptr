@@ -17,6 +17,7 @@ namespace ft
     {
     public:
         typedef typename _internal::element_type<T>::type element_type;
+        typedef typename _internal::_weak_count counted_type;
 
     private:
         template <typename U>
@@ -26,7 +27,7 @@ namespace ft
 
     private:
         element_type* ptr;
-        _weak_count ref;
+        counted_type ref;
 
     public:
         weak_ptr() throw()

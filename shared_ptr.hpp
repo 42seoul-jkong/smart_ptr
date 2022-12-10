@@ -23,6 +23,7 @@ namespace ft
     {
     public:
         typedef typename _internal::element_type<T>::type element_type;
+        typedef _internal::_shared_count counted_type;
 
     private:
         template <typename U>
@@ -49,7 +50,7 @@ namespace ft
 
     private:
         element_type* ptr;
-        _shared_count ref;
+        counted_type ref;
 
     public:
         shared_ptr() throw()
@@ -60,7 +61,7 @@ namespace ft
             : ptr(p), ref()
         {
             _internal::assert_convertible<U, element_type>();
-            _shared_count(p).swap(this->ref);
+            counted_type(p).swap(this->ref);
             _ptr_enable_shared_from_this<T>(this, p, p);
         }
 
