@@ -155,14 +155,35 @@ namespace ft
     template <typename T, typename TAlloc>
     typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n)
     {
-        // TODO:
-        _internal::allocate_guard<TAlloc> alloc(a, n);
-        ft::shared_ptr<T> result = ft::shared_ptr<T>(alloc.get(), _internal::allocator_delete<T, TAlloc>(a, n), a);
+        typedef typename TAlloc::template rebind<typename _internal::element_type<T>::type>::other alloc_type;
+        _internal::allocate_guard<alloc_type> alloc(a, n);
+        ft::shared_ptr<T> result = ft::shared_ptr<T>(alloc.get(), _internal::allocator_delete<T, alloc_type>(a, n), a);
         alloc.reset();
         return result;
     }
 
-    // TODO: array element, but the elements of the array are initialized from the default value.
+    template <typename T, typename TAlloc>
+    typename _internal::enable_if<_internal::is_bounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, const typename _internal::element_type<T>::type& def)
+    {
+        std::size_t n = _internal::array_extent<T>::value;
+        ft::shared_ptr<T> result = allocate_shared<T>(a);
+        while (n != 0)
+        {
+            result[--n] = def;
+        }
+        return result;
+    }
+
+    template <typename T, typename TAlloc>
+    typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n, const typename _internal::element_type<T>::type& def)
+    {
+        ft::shared_ptr<T> result = allocate_shared<T>(a, n);
+        while (n != 0)
+        {
+            result[--n] = def;
+        }
+        return result;
+    }
 
     template <typename T>
     ft::shared_ptr<T> make_shared()
