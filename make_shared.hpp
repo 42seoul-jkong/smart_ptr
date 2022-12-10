@@ -58,7 +58,7 @@ namespace ft
 
         public:
             template <typename U>
-            void operator()(U* p) const throw() {}
+            void operator()(U* p) const throw() { (void)&p; }
 
         public:
             pointer_type get_data() throw() { return this->data; }
@@ -210,7 +210,7 @@ namespace ft
     typename _internal::enable_if<_internal::is_bounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, const typename _internal::element_type<T>::type& def)
     {
         std::size_t n = _internal::array_extent<T>::value;
-        ft::shared_ptr<T> result = allocate_shared<T>(a);
+        ft::shared_ptr<T> result = ft::allocate_shared<T>(a);
         while (n != 0)
         {
             result[--n] = def;
@@ -231,10 +231,11 @@ namespace ft
     template <typename T, typename TAlloc>
     typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n, const typename _internal::element_type<T>::type& def)
     {
-        ft::shared_ptr<T> result = allocate_shared<T>(a, n);
+        typedef typename _internal::element_type<T>::type TElem;
+        ft::shared_ptr<T> result = ft::allocate_shared<T>(a, n);
         while (n != 0)
         {
-            result[--n] = def;
+            ::new (_internal::addressof(result[--n])) TElem(def);
         }
         return result;
     }
@@ -242,60 +243,60 @@ namespace ft
     template <typename T>
     ft::shared_ptr<T> make_shared()
     {
-        return allocate_shared<T>(std::allocator<T>());
+        return ft::allocate_shared<T>(std::allocator<T>());
     }
 
     template <typename T, typename A1>
     ft::shared_ptr<T> make_shared(const A1& a1)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1);
     }
 
     template <typename T, typename A1, typename A2>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2);
     }
 
     template <typename T, typename A1, typename A2, typename A3>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3);
     }
 
     template <typename T, typename A1, typename A2, typename A3, typename A4>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3, const A4& a4)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4);
     }
 
     template <typename T, typename A1, typename A2, typename A3, typename A4, typename A5>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5);
     }
 
     template <typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5, const A6& a6)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6);
     }
 
     template <typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5, const A6& a6, const A7& a7)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6, a7);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6, a7);
     }
 
     template <typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5, const A6& a6, const A7& a7, const A8& a8)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6, a7, a8);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6, a7, a8);
     }
 
     template <typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
     ft::shared_ptr<T> make_shared(const A1& a1, const A2& a2, const A3& a3, const A4& a4, const A5& a5, const A6& a6, const A7& a7, const A8& a8, const A9& a9)
     {
-        return allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6, a7, a8, a9);
+        return ft::allocate_shared<T>(std::allocator<T>(), a1, a2, a3, a4, a5, a6, a7, a8, a9);
     }
 }
