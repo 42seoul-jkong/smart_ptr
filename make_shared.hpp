@@ -85,6 +85,7 @@ namespace ft
 
                 alloc_type alloc(this->alloc);
 
+                alloc.destroy(p);
                 alloc.deallocate(p, 1);
             }
 
@@ -109,6 +110,10 @@ namespace ft
 
                 alloc_type alloc(this->alloc);
 
+                for (std::size_t i = 0; i < this->n; i++)
+                {
+                    alloc.destroy(p);
+                }
                 alloc.deallocate(p, this->n);
             }
 
@@ -132,6 +137,10 @@ namespace ft
 
                 alloc_type alloc(this->alloc);
 
+                for (std::size_t i = 0; i < N; i++)
+                {
+                    alloc.destroy(p);
+                }
                 alloc.deallocate(p, N);
             }
 
@@ -221,21 +230,43 @@ namespace ft
     template <typename T, typename TAlloc>
     typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n)
     {
-        typedef typename TAlloc::template rebind<typename _internal::element_type<T>::type>::other alloc_type;
-        _internal::allocate_guard<alloc_type> alloc(a, n);
-        ft::shared_ptr<T> result = ft::shared_ptr<T>(alloc.get(), _internal::allocator_delete<T, alloc_type>(a, n), a);
-        alloc.reset();
+        typedef typename _internal::element_type<T>::type TElem;
+        typedef typename TAlloc::template rebind<TElem>::other alloc_type;
+
+        alloc_type alloc = a;
+        _internal::allocate_guard<alloc_type> guard(alloc, n);
+
+        TElem* p = guard.get();
+        std::size_t i = 0;
+        try
+        {
+            for (std::size_t i = 0; i < n; i++)
+            {
+                alloc.construct(_internal::addressof(p[i]), TElem());
+            }
+        }
+        catch (...)
+        {
+            while (i != 0)
+            {
+                --i;
+                alloc.destroy(_internal::addressof(p[i]));
+            }
+        }
+
+        ft::shared_ptr<T> result = ft::shared_ptr<T>(p, _internal::allocator_delete<T, alloc_type>(a, n), a);
+        guard.reset();
+
         return result;
     }
 
     template <typename T, typename TAlloc>
     typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n, const typename _internal::element_type<T>::type& def)
     {
-        typedef typename _internal::element_type<T>::type TElem;
         ft::shared_ptr<T> result = ft::allocate_shared<T>(a, n);
         while (n != 0)
         {
-            ::new (_internal::addressof(result[--n])) TElem(def);
+            result[--n] = def;
         }
         return result;
     }
