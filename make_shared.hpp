@@ -28,14 +28,14 @@ namespace ft
 
         public:
             template <typename U>
-            void operator()(U* p) const
+            void operator()(U* p) const throw()
             {
                 static_cast<T*>(p)->~T();
             }
 
         public:
-            pointer_type get_data() { return _internal::addressof(this->data); }
-            const allocate_type& get_allocator() const { return this->alloc; }
+            pointer_type get_data() throw() { return _internal::addressof(this->data); }
+            const allocate_type& get_allocator() const throw() { return this->alloc; }
 
         private:
             deleter_storage& operator=(const deleter_storage&);
@@ -58,11 +58,11 @@ namespace ft
 
         public:
             template <typename U>
-            void operator()(U* p) const {}
+            void operator()(U* p) const throw() {}
 
         public:
-            pointer_type get_data() { return this->data; }
-            const allocate_type& get_allocator() const { return this->alloc; }
+            pointer_type get_data() throw() { return this->data; }
+            const allocate_type& get_allocator() const throw() { return this->alloc; }
 
         private:
             deleter_storage& operator=(const deleter_storage&);
@@ -79,7 +79,7 @@ namespace ft
             ~allocator_delete() {}
 
             template <typename U>
-            void operator()(U* p) const
+            void operator()(U* p) const throw()
             {
                 typedef typename TAlloc::template rebind<U>::other alloc_type;
 
@@ -103,7 +103,7 @@ namespace ft
             allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc), n(that.n) {}
 
             template <typename U>
-            void operator()(U* p) const
+            void operator()(U* p) const throw()
             {
                 typedef typename TAlloc::template rebind<U>::other alloc_type;
 
@@ -126,7 +126,7 @@ namespace ft
             allocator_delete(const allocator_delete& that) throw() : alloc(that.alloc) {}
 
             template <typename U>
-            void operator()(U* p) const
+            void operator()(U* p) const throw()
             {
                 typedef typename TAlloc::template rebind<U>::other alloc_type;
 

@@ -274,8 +274,8 @@ namespace ft
                 }
             }
 
-            pointer get() const { return this->ptr; }
-            void reset() { this->ptr = NULL; }
+            pointer get() const throw() { return this->ptr; }
+            void reset() throw() { this->ptr = NULL; }
 
         private:
             allocate_guard& operator=(const allocate_guard&);
