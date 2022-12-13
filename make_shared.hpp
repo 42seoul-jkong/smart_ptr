@@ -28,10 +28,7 @@ namespace ft
 
         public:
             template <typename U>
-            void operator()(U* p) const throw()
-            {
-                static_cast<T*>(p)->~T();
-            }
+            void operator()(U* p) const throw() { (void)&p; }
 
         public:
             pointer_type get_data() throw() { return _internal::addressof(this->data); }
@@ -231,11 +228,11 @@ namespace ft
     template <typename T, typename TAlloc>
     typename _internal::enable_if<_internal::is_unbounded_array<T>::value, ft::shared_ptr<T> >::type allocate_shared(const TAlloc& a, std::size_t n, const typename _internal::element_type<T>::type& def)
     {
-        typedef typename _internal::element_type<T>::type TElem;
+        typedef typename _internal::element_type<T>::type elem_type;
         ft::shared_ptr<T> result = ft::allocate_shared<T>(a, n);
         while (n != 0)
         {
-            ::new (_internal::addressof(result[--n])) TElem(def);
+            ::new (_internal::addressof(result[--n])) elem_type(def);
         }
         return result;
     }
