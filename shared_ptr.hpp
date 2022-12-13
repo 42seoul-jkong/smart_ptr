@@ -163,10 +163,10 @@ namespace ft
             return this->ptr;
         }
 
-        typename _internal::array_access<T>::type operator[](std::size_t i) const throw()
+        typename _internal::array_access<T>::type operator[](std::ptrdiff_t i) const throw()
         {
             assert(this->ptr != NULL);
-            assert(i >= 0 && (i < _internal::array_extent<T>::value || _internal::array_extent<T>::value == 0));
+            assert(static_cast<std::size_t>(i) < _internal::array_extent<T>::value || _internal::array_extent<T>::value == 0);
 
             return this->ptr[i];
         }
