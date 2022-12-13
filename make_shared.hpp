@@ -18,20 +18,23 @@ namespace ft
             typedef T* pointer_type;
             typedef TAlloc allocate_type;
 
-            T data;
+            unsigned char data[sizeof(T)];
             TAlloc alloc;
 
         public:
-            deleter_storage(const T& data, const TAlloc& alloc) throw() : data(data), alloc(alloc) {}
-            deleter_storage(const deleter_storage& that) throw() : data(that.data), alloc(that.alloc) {}
+            deleter_storage(const TAlloc& alloc) throw() : alloc(alloc) {}
+            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc) {}
             ~deleter_storage() {}
 
         public:
             template <typename U>
-            void operator()(U* p) const throw() { (void)&p; }
+            void operator()(U* p) const throw()
+            {
+                static_cast<T*>(p)->~T();
+            }
 
         public:
-            pointer_type get_data() throw() { return _internal::addressof(this->data); }
+            pointer_type get_data() throw() { return reinterpret_cast<T*>(this->data); }
             const allocate_type& get_allocator() const throw() { return this->alloc; }
 
         private:
@@ -45,7 +48,7 @@ namespace ft
             typedef T* pointer_type;
             typedef TAlloc allocate_type;
 
-            T data[N];
+            unsigned char data[N * sizeof(T)];
             TAlloc alloc;
 
         public:
@@ -55,10 +58,17 @@ namespace ft
 
         public:
             template <typename U>
-            void operator()(U* p) const throw() { (void)&p; }
+            void operator()(U* p) const throw()
+            {
+                T* arr = static_cast<T*>(p);
+                for (std::size_t i = 0; i < N; i++)
+                {
+                    static_cast<T*>(_internal::addressof(arr[i]))->~T();
+                }
+            }
 
         public:
-            pointer_type get_data() throw() { return this->data; }
+            pointer_type get_data() throw() { return reinterpret_cast<T*>(this->data); }
             const allocate_type& get_allocator() const throw() { return this->alloc; }
 
         private:
@@ -210,7 +220,7 @@ namespace ft
         ft::shared_ptr<T> result = ft::allocate_shared<T>(a);
         while (n != 0)
         {
-            result[--n] = def;
+            ::new (_internal::addressof(result[--n])) elem_type(def);
         }
         return result;
     }

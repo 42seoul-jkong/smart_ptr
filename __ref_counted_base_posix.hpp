@@ -73,8 +73,8 @@ namespace ft
 
                 if (release_resource)
                 {
-                    dispose();
-                    weak_release();
+                    this->dispose();
+                    this->weak_release();
                 }
             }
 
@@ -101,7 +101,7 @@ namespace ft
 
                 if (release_this)
                 {
-                    destroy();
+                    this->destroy();
                 }
             }
 
