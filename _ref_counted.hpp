@@ -201,6 +201,7 @@ namespace ft
 
                 ::new (this_ptr) counted_type(this_p, storage, alloc_counted);
                 init(this_storage);
+                this_storage.set();
 
                 this->ptr = this_ptr;
                 *pp = this_p;

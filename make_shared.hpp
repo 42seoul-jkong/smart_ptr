@@ -17,18 +17,24 @@ namespace ft
         {
             typedef TAlloc allocate_type;
 
+            bool init;
             unsigned char data[sizeof(T)];
             TAlloc alloc;
 
         public:
-            deleter_storage(const TAlloc& alloc) throw() : alloc(alloc) {}
-            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc) {}
+            deleter_storage(const TAlloc& alloc) throw() : init(false), alloc(alloc) {}
+            deleter_storage(const deleter_storage& that) throw() : init(that.init), alloc(that.alloc) {}
             ~deleter_storage() {}
 
         public:
             template <typename U>
             void operator()(U* p) const throw()
             {
+                if (!this->init)
+                {
+                    return;
+                }
+
                 static_cast<T*>(p)->~T();
             }
 
@@ -37,6 +43,7 @@ namespace ft
             T* get_dynamic() const throw() { return NULL; }
             const allocate_type& get_allocator() const throw() { return this->alloc; }
             std::size_t size() const throw() { return 1; }
+            void set() throw() { this->init = true; }
 
         private:
             deleter_storage& operator=(const deleter_storage&);
@@ -50,18 +57,24 @@ namespace ft
             typedef typename _internal::scalar_type<T>::type single_type;
             static const std::size_t single_count = _internal::scalar_count<T>::value;
 
+            bool init;
             unsigned char data[N * sizeof(T)];
             TAlloc alloc;
 
         public:
-            deleter_storage(const TAlloc& alloc) throw() : alloc(alloc) {}
-            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc) {}
+            deleter_storage(const TAlloc& alloc) throw() : init(false), alloc(alloc) {}
+            deleter_storage(const deleter_storage& that) throw() : init(that.init), alloc(that.alloc) {}
             ~deleter_storage() {}
 
         public:
             template <typename U>
             void operator()(U* p) const throw()
             {
+                if (!this->init)
+                {
+                    return;
+                }
+
                 single_type* const arr = reinterpret_cast<single_type*>(p);
                 const std::size_t n = this->size();
                 for (std::size_t i = 0; i < n; i++)
@@ -75,6 +88,7 @@ namespace ft
             T* get_dynamic() const throw() { return NULL; }
             const allocate_type& get_allocator() const throw() { return this->alloc; }
             std::size_t size() const throw() { return N * single_count; }
+            void set() throw() { this->init = true; }
 
         private:
             deleter_storage& operator=(const deleter_storage&);
@@ -88,17 +102,23 @@ namespace ft
             typedef typename _internal::scalar_type<T>::type single_type;
             static const std::size_t single_count = _internal::scalar_count<T>::value;
 
+            bool init;
             TAlloc alloc;
             T* data;
             std::size_t n;
 
         public:
-            deleter_storage(const TAlloc& alloc, T* data, std::size_t n) throw() : alloc(alloc), data(data), n(n) {}
-            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc), data(that.data), n(that.n) {}
+            deleter_storage(const TAlloc& alloc, T* data, std::size_t n) throw() : init(false), alloc(alloc), data(data), n(n) {}
+            deleter_storage(const deleter_storage& that) throw() : init(that.init), alloc(that.alloc), data(that.data), n(that.n) {}
 
             template <typename U>
             void operator()(U* p) const throw()
             {
+                if (!this->init)
+                {
+                    return;
+                }
+
                 typedef typename TAlloc::template rebind<T>::other alloc_type;
 
                 alloc_type alloc(this->alloc);
@@ -118,6 +138,7 @@ namespace ft
             T* get_dynamic() const throw() { return this->data; }
             const allocate_type& get_allocator() const throw() { return this->alloc; }
             std::size_t size() const throw() { return this->n * single_count; }
+            void set() throw() { this->init = true; }
 
         private:
             deleter_storage& operator=(const deleter_storage&);
@@ -134,7 +155,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T;
             }
@@ -155,7 +176,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1);
             }
@@ -177,7 +198,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2);
             }
@@ -200,7 +221,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3);
             }
@@ -224,7 +245,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4);
             }
@@ -249,7 +270,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5);
             }
@@ -275,7 +296,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6);
             }
@@ -302,7 +323,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6, this->a7);
             }
@@ -330,7 +351,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6, this->a7, this->a8);
             }
@@ -359,7 +380,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6, this->a7, this->a8, this->a9);
             }
@@ -379,7 +400,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 typedef typename TStorage::single_type single_type;
 
@@ -400,6 +421,7 @@ namespace ft
                         --i;
                         arr[i].~single_type();
                     }
+                    throw;
                 }
             }
 
@@ -419,7 +441,7 @@ namespace ft
 
         public:
             template <typename TStorage>
-            void operator()(TStorage& storage) const throw()
+            void operator()(TStorage& storage) const
             {
                 typedef typename TStorage::single_type single_type;
 
@@ -440,6 +462,7 @@ namespace ft
                         --i;
                         arr[i].~single_type();
                     }
+                    throw;
                 }
             }
 
