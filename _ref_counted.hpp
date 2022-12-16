@@ -181,10 +181,10 @@ namespace ft
             }
 
             // Internal BEGIN
-            template <typename T, typename TStorage>
-            _shared_count(_internal::internal_tag, T** pp, const TStorage& storage)
+            template <typename T, typename TStorage, typename TInitializer>
+            _shared_count(_internal::internal_tag, T** pp, const TStorage& storage, TInitializer init)
             {
-                typedef _counted_impl_del_alloc<typename TStorage::pointer_type, TStorage, typename TStorage::allocate_type> counted_type;
+                typedef _counted_impl_del_alloc<T*, TStorage, typename TStorage::allocate_type> counted_type;
                 typedef typename TStorage::allocate_type::template rebind<counted_type>::other alloc_type;
 
                 alloc_type alloc_counted(storage.get_allocator());
@@ -192,9 +192,15 @@ namespace ft
 
                 counted_type* this_ptr = guard.get();
                 TStorage& this_storage = this_ptr->get_deleter();
-                T* this_p = this_storage.get_data();
+                T* this_p = storage.get_dynamic();
+                if (this_p == NULL)
+                {
+                    // is not dynamic
+                    this_p = this_storage.get_data();
+                }
 
                 ::new (this_ptr) counted_type(this_p, storage, alloc_counted);
+                init(this_storage);
 
                 this->ptr = this_ptr;
                 *pp = this_p;

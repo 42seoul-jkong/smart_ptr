@@ -249,6 +249,30 @@ namespace ft
                     reinterpret_cast<const volatile char&>(arg)));
         }
 
+        template <class T>
+        struct scalar_type
+        {
+            typedef T type;
+        };
+
+        template <class T, std::size_t N>
+        struct scalar_type<T[N]>
+        {
+            typedef typename scalar_type<T>::type type;
+        };
+
+        template <class T>
+        struct scalar_count
+        {
+            static const std::size_t value = 1;
+        };
+
+        template <class T, std::size_t N>
+        struct scalar_count<T[N]>
+        {
+            static const std::size_t value = N * scalar_count<T>::value;
+        };
+
         template <typename TAlloc>
         struct allocate_guard
         {
