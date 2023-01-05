@@ -22,8 +22,8 @@ namespace ft
             bool init;
 
         public:
-            deleter_storage(const TAlloc& alloc) throw() : init(false), alloc(alloc) {}
-            deleter_storage(const deleter_storage& that) throw() : init(that.init), alloc(that.alloc) {}
+            deleter_storage(const TAlloc& alloc) throw() : alloc(alloc), init(false) {}
+            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc), init(that.init) {}
             ~deleter_storage() {}
 
         public:
@@ -62,8 +62,8 @@ namespace ft
             bool init;
 
         public:
-            deleter_storage(const TAlloc& alloc) throw() : init(false), alloc(alloc) {}
-            deleter_storage(const deleter_storage& that) throw() : init(that.init), alloc(that.alloc) {}
+            deleter_storage(const TAlloc& alloc) throw() : alloc(alloc), init(false) {}
+            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc), init(that.init) {}
             ~deleter_storage() {}
 
         public:
@@ -108,8 +108,8 @@ namespace ft
             bool init;
 
         public:
-            deleter_storage(const TAlloc& alloc, T* data, std::size_t n) throw() : init(false), alloc(alloc), data(data), n(n) {}
-            deleter_storage(const deleter_storage& that) throw() : init(that.init), alloc(that.alloc), data(that.data), n(that.n) {}
+            deleter_storage(const TAlloc& alloc, T* data, std::size_t n) throw() : alloc(alloc), data(data), n(n), init(false) {}
+            deleter_storage(const deleter_storage& that) throw() : alloc(that.alloc), data(that.data), n(that.n), init(that.init) {}
 
             template <typename U>
             void operator()(U* p) const throw()
