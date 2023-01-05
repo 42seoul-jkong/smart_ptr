@@ -17,9 +17,9 @@ namespace ft
         {
             typedef TAlloc allocate_type;
 
-            bool init;
             unsigned char data[sizeof(T)];
             TAlloc alloc;
+            bool init;
 
         public:
             deleter_storage(const TAlloc& alloc) throw() : init(false), alloc(alloc) {}
@@ -57,9 +57,9 @@ namespace ft
             typedef typename _internal::scalar_type<T>::type single_type;
             static const std::size_t single_count = _internal::scalar_count<T>::value;
 
-            bool init;
             unsigned char data[N * sizeof(T)];
             TAlloc alloc;
+            bool init;
 
         public:
             deleter_storage(const TAlloc& alloc) throw() : init(false), alloc(alloc) {}
@@ -102,10 +102,10 @@ namespace ft
             typedef typename _internal::scalar_type<T>::type single_type;
             static const std::size_t single_count = _internal::scalar_count<T>::value;
 
-            bool init;
-            TAlloc alloc;
             T* data;
+            TAlloc alloc;
             std::size_t n;
+            bool init;
 
         public:
             deleter_storage(const TAlloc& alloc, T* data, std::size_t n) throw() : init(false), alloc(alloc), data(data), n(n) {}
