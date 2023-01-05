@@ -101,6 +101,7 @@ namespace ft
 
         public:
             TPointer get_pointer() { return this->ptr; }
+            void init_pointer(TPointer ptr) { this->ptr = ptr; }
 
             TDelete& get_deleter() { return this->del; }
             const TDelete& get_deleter() const { return this->del; }
@@ -191,6 +192,9 @@ namespace ft
                 _internal::allocate_guard<alloc_type> guard(alloc_counted);
 
                 counted_type* this_ptr = guard.get();
+
+                ::new (this_ptr) counted_type(static_cast<T*>(NULL), storage, alloc_counted);
+
                 TStorage& this_storage = this_ptr->get_deleter();
                 T* this_p = storage.get_dynamic();
                 if (this_p == NULL)
@@ -198,8 +202,8 @@ namespace ft
                     // is not dynamic
                     this_p = this_storage.get_data();
                 }
+                this_ptr->init_pointer(this_p);
 
-                ::new (this_ptr) counted_type(this_p, storage, alloc_counted);
                 init(this_storage);
                 this_storage.set();
 
