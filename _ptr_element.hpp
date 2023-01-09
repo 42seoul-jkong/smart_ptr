@@ -72,7 +72,7 @@ namespace ft
         template <typename TSource, typename TDest>
         inline void assert_convertible() throw()
         {
-            (void)sizeof(char[convertible<TSource, TDest>::value ? 1 : -1]);
+            static_cast<void>(sizeof(char[convertible<TSource, TDest>::value ? 1 : -1]));
         }
 
         template <typename T>

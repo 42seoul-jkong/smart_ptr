@@ -226,7 +226,7 @@ namespace ft
     shared_ptr<T> static_pointer_cast(const shared_ptr<TSource>& that) throw()
     {
         // Compile-time test
-        (void)static_cast<T*>(static_cast<TSource*>(NULL));
+        static_cast<void>(static_cast<T*>(static_cast<TSource*>(NULL)));
 
         return shared_ptr<T>(that, static_cast<typename shared_ptr<T>::element_type*>(that.get()));
     }
@@ -235,7 +235,7 @@ namespace ft
     shared_ptr<T> const_pointer_cast(const shared_ptr<TSource>& that) throw()
     {
         // Compile-time test
-        (void)const_cast<T*>(static_cast<TSource*>(NULL));
+        static_cast<void>(const_cast<T*>(static_cast<TSource*>(NULL)));
 
         return shared_ptr<T>(that, const_cast<typename shared_ptr<T>::element_type*>(that.get()));
     }
@@ -244,7 +244,7 @@ namespace ft
     shared_ptr<T> dynamic_pointer_cast(const shared_ptr<TSource>& that) throw()
     {
         // Compile-time test
-        (void)dynamic_cast<T*>(static_cast<TSource*>(NULL));
+        static_cast<void>(dynamic_cast<T*>(static_cast<TSource*>(NULL)));
 
         // Run-time test
         typename shared_ptr<T>::element_type* p = dynamic_cast<typename shared_ptr<T>::element_type*>(that.get());
@@ -260,7 +260,7 @@ namespace ft
     shared_ptr<T> reinterpret_pointer_cast(const shared_ptr<TSource>& that) throw()
     {
         // Compile-time test
-        (void)reinterpret_cast<T*>(static_cast<TSource*>(NULL));
+        static_cast<void>(reinterpret_cast<T*>(static_cast<TSource*>(NULL)));
 
         return shared_ptr<T>(that, reinterpret_cast<typename shared_ptr<T>::element_type*>(that.get()));
     }
