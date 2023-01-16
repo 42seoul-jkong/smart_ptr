@@ -186,9 +186,12 @@ namespace ft
             return this->ref.use_count();
         }
 
-        operator bool() const throw()
+        // explicit operator bool
+        void unspecified_bool_type_func() const {}
+        typedef void (shared_ptr::*unspecified_bool_type)() const;
+        operator unspecified_bool_type() const throw()
         {
-            return this->ptr != NULL;
+            return !this->ptr ? NULL : &this_type::unspecified_bool_type_func;
         }
 
         void swap(shared_ptr& that) throw()
