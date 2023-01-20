@@ -191,7 +191,7 @@ namespace ft
         typedef void (shared_ptr::*unspecified_bool_type)() const;
         operator unspecified_bool_type() const throw()
         {
-            return !this->ptr ? NULL : &this_type::unspecified_bool_type_func;
+            return !this->ptr ? NULL : &shared_ptr::unspecified_bool_type_func;
         }
 
         void swap(shared_ptr& that) throw()

@@ -178,7 +178,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1));
             }
 
         private:
@@ -200,7 +200,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2));
             }
 
         private:
@@ -223,7 +223,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3));
             }
 
         private:
@@ -247,7 +247,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3), const_cast<A4&>(this->a4));
             }
 
         private:
@@ -272,7 +272,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3), const_cast<A4&>(this->a4), const_cast<A5&>(this->a5));
             }
 
         private:
@@ -298,7 +298,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3), const_cast<A4&>(this->a4), const_cast<A5&>(this->a5), const_cast<A6&>(this->a6));
             }
 
         private:
@@ -325,7 +325,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6, this->a7);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3), const_cast<A4&>(this->a4), const_cast<A5&>(this->a5), const_cast<A6&>(this->a6), const_cast<A7&>(this->a7));
             }
 
         private:
@@ -353,7 +353,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6, this->a7, this->a8);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3), const_cast<A4&>(this->a4), const_cast<A5&>(this->a5), const_cast<A6&>(this->a6), const_cast<A7&>(this->a7), const_cast<A8&>(this->a8));
             }
 
         private:
@@ -382,7 +382,7 @@ namespace ft
             template <typename TStorage>
             void operator()(TStorage& storage) const
             {
-                ::new (storage.get_data()) T(this->a1, this->a2, this->a3, this->a4, this->a5, this->a6, this->a7, this->a8, this->a9);
+                ::new (storage.get_data()) T(const_cast<A1&>(this->a1), const_cast<A2&>(this->a2), const_cast<A3&>(this->a3), const_cast<A4&>(this->a4), const_cast<A5&>(this->a5), const_cast<A6&>(this->a6), const_cast<A7&>(this->a7), const_cast<A8&>(this->a8), const_cast<A9&>(this->a9));
             }
 
         private:
