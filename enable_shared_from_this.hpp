@@ -34,7 +34,8 @@ namespace ft
         template <typename TAlias, typename U>
         void change_ownership(const ft::shared_ptr<TAlias>* alias, U* p) const throw()
         {
-            // NOTE: 아래 코드는 비원자적 연산으로 스레드 비안전함.
+            // 아래 코드는 비원자적 연산으로 스레드 비안전함.
+            // 하지만 최초에만 쓰기 연산을 하고, 나머지 경우는 읽기 연산만 하므로 문제가 없다.
             if (this->weak_this.expired())
             {
                 this->weak_this = ft::shared_ptr<T>(*alias, p);
