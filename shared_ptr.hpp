@@ -213,6 +213,30 @@ namespace ft
         return lhs.get() != rhs.get();
     }
 
+    template <typename T, typename U>
+    bool operator<(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw()
+    {
+        return lhs.get() < rhs.get();
+    }
+
+    template <typename T, typename U>
+    bool operator<=(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw()
+    {
+        return lhs.get() <= rhs.get();
+    }
+
+    template <typename T, typename U>
+    bool operator>(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw()
+    {
+        return lhs.get() > rhs.get();
+    }
+
+    template <typename T, typename U>
+    bool operator>=(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw()
+    {
+        return lhs.get() >= rhs.get();
+    }
+
     template <typename T>
     void swap(shared_ptr<T>& lhs, shared_ptr<T>& rhs) throw()
     {
