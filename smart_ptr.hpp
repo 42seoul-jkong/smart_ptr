@@ -10,3 +10,5 @@
 #include "enable_shared_from_this.hpp"
 
 #include "make_shared.hpp"
+
+#include "bad_weak_ptr.hpp"

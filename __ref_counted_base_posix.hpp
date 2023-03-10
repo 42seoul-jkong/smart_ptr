@@ -7,6 +7,9 @@
 
 #include <cassert>
 
+// #include <iostream>
+// #define OUTPUT_REF_COUNTED std::cout
+
 namespace ft
 {
     namespace _internal
@@ -40,22 +43,20 @@ namespace ft
 
             void add_ref_copy()
             {
+                assert(pthread_mutex_lock(&this->mutex) == 0);
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": ++" << this->shared_count << " (Weak=" << this->weak_count << ")" << std::endl;
 #endif
-
-                assert(pthread_mutex_lock(&this->mutex) == 0);
                 ++this->shared_count;
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
             }
 
             bool add_ref_lock()
             {
+                assert(pthread_mutex_lock(&this->mutex) == 0);
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": ++" << this->shared_count << " (Weak=" << this->weak_count << ")" << std::endl;
 #endif
-
-                assert(pthread_mutex_lock(&this->mutex) == 0);
                 bool success = this->shared_count == 0 ? false : (++this->shared_count, true);
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
                 return success;
@@ -63,11 +64,10 @@ namespace ft
 
             void release() // throw()
             {
+                assert(pthread_mutex_lock(&this->mutex) == 0);
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": --" << this->shared_count << " (Weak=" << this->weak_count << ")" << std::endl;
 #endif
-
-                assert(pthread_mutex_lock(&this->mutex) == 0);
                 bool release_resource = --this->shared_count == 0;
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
 
@@ -80,22 +80,20 @@ namespace ft
 
             void weak_add_ref() // throw()
             {
+                assert(pthread_mutex_lock(&this->mutex) == 0);
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": " << this->shared_count << " (Weak=++" << this->weak_count << ")" << std::endl;
 #endif
-
-                assert(pthread_mutex_lock(&this->mutex) == 0);
                 ++this->weak_count;
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
             }
 
             void weak_release() // throw()
             {
+                assert(pthread_mutex_lock(&this->mutex) == 0);
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": " << this->shared_count << " (Weak=--" << this->weak_count << ")" << std::endl;
 #endif
-
-                assert(pthread_mutex_lock(&this->mutex) == 0);
                 bool release_this = --this->weak_count == 0;
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
 
@@ -107,11 +105,10 @@ namespace ft
 
             long use_count() const // throw()
             {
+                assert(pthread_mutex_lock(&this->mutex) == 0);
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": " << this->shared_count << " (Weak=" << this->weak_count << ")" << std::endl;
 #endif
-
-                assert(pthread_mutex_lock(&this->mutex) == 0);
                 count_type value = this->shared_count;
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
 

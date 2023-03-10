@@ -4,6 +4,7 @@
 #pragma once
 
 #include "__ref_counted_base_posix.hpp"
+#include "bad_weak_ptr.hpp"
 
 #include <stdexcept>
 
@@ -390,7 +391,7 @@ namespace ft
         {
             if (this->ptr == NULL || !this->ptr->add_ref_lock())
             {
-                throw std::runtime_error("bad_weak_ptr");
+                throw bad_weak_ptr();
             }
         }
 
