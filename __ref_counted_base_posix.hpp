@@ -57,7 +57,7 @@ namespace ft
 #ifdef OUTPUT_REF_COUNTED
                 OUTPUT_REF_COUNTED << static_cast<const void*>(this) << ": " << __PRETTY_FUNCTION__ << ": ++" << this->shared_count << " (Weak=" << this->weak_count << ")" << std::endl;
 #endif
-                bool success = this->shared_count == 0 ? false : (++this->shared_count, true);
+                bool success = this->shared_count == 0 ? false : (static_cast<void>(++this->shared_count), true);
                 assert(pthread_mutex_unlock(&this->mutex) == 0);
                 return success;
             }

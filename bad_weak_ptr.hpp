@@ -11,6 +11,7 @@ namespace ft
     {
     public:
         bad_weak_ptr() throw() : std::exception() {}
-        const char* what() const throw() { return "bad weak pointer"; }
+        virtual ~bad_weak_ptr() throw() {}
+        virtual const char* what() const throw() { return "bad weak pointer"; }
     };
 }
